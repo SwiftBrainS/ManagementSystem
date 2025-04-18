@@ -829,33 +829,33 @@ class EmployeeManagementSystem:
     
     def create_position_form(self):
         # 职位ID
-        CTkLabel(self.pos_form_frame, text='职位ID', font=('arial', 16, 'bold'), text_color='white').grid(row=0, column=0, padx=20, pady=15, sticky='w')
+        CTkLabel(self.pos_form_frame, text='职位ID', font=('arial', 16, 'bold'), text_color='white').grid(row=0, column=0, padx=(20, 0), pady=15, sticky='w')
         self.pos_id_entry = CTkEntry(self.pos_form_frame, font=('arial', 14), width=180)
-        self.pos_id_entry.grid(row=0, column=1)
+        self.pos_id_entry.grid(row=0, column=1, sticky='w')
         
         # 职位名称
-        CTkLabel(self.pos_form_frame, text='职位名称', font=('arial', 16, 'bold'), text_color='white').grid(row=1, column=0, padx=20, pady=15, sticky='w')
+        CTkLabel(self.pos_form_frame, text='职位名称', font=('arial', 16, 'bold'), text_color='white').grid(row=1, column=0, padx=(20, 0), pady=15, sticky='w')
         self.pos_name_entry = CTkEntry(self.pos_form_frame, font=('arial', 14), width=180)
-        self.pos_name_entry.grid(row=1, column=1)
+        self.pos_name_entry.grid(row=1, column=1, sticky='w')
         
         # 职位类别
-        CTkLabel(self.pos_form_frame, text='职位类别', font=('arial', 16, 'bold'), text_color='white').grid(row=2, column=0, padx=20, pady=15, sticky='w')
+        CTkLabel(self.pos_form_frame, text='职位类别', font=('arial', 16, 'bold'), text_color='white').grid(row=2, column=0, padx=(20, 0), pady=15, sticky='w')
         category_options = ['技术', '管理', '市场', '行政', '财务', '人力资源', '其他']
         self.pos_category_box = CTkComboBox(self.pos_form_frame, values=category_options, font=('arial', 14), width=180, state='readonly')
-        self.pos_category_box.grid(row=2, column=1)
+        self.pos_category_box.grid(row=2, column=1, sticky='w')
         self.pos_category_box.set(category_options[0])
         
         # 职位级别
-        CTkLabel(self.pos_form_frame, text='职位级别', font=('arial', 16, 'bold'), text_color='white').grid(row=3, column=0, padx=20, pady=15, sticky='w')
+        CTkLabel(self.pos_form_frame, text='职位级别', font=('arial', 16, 'bold'), text_color='white').grid(row=3, column=0, padx=(20, 0), pady=15, sticky='w')
         level_options = ['1', '2', '3', '4', '5']
         self.pos_level_box = CTkComboBox(self.pos_form_frame, values=level_options, font=('arial', 14), width=180, state='readonly')
-        self.pos_level_box.grid(row=3, column=1)
+        self.pos_level_box.grid(row=3, column=1, sticky='w')
         self.pos_level_box.set(level_options[0])
         
         # 基本工资
-        CTkLabel(self.pos_form_frame, text='基本工资', font=('arial', 16, 'bold'), text_color='white').grid(row=4, column=0, padx=20, pady=15, sticky='w')
+        CTkLabel(self.pos_form_frame, text='基本工资', font=('arial', 16, 'bold'), text_color='white').grid(row=4, column=0, padx=(20, 0), pady=15, sticky='w')
         self.pos_salary_entry = CTkEntry(self.pos_form_frame, font=('arial', 14), width=180)
-        self.pos_salary_entry.grid(row=4, column=1)
+        self.pos_salary_entry.grid(row=4, column=1, sticky='w')
         
         # 按钮框架
         button_frame = CTkFrame(self.pos_form_frame, fg_color='#161C30')
@@ -1152,35 +1152,35 @@ class EmployeeManagementSystem:
         # 项目ID
         CTkLabel(self.proj_form_frame, text='项目ID', font=('arial', 16, 'bold'), text_color='white').grid(row=0, column=0, padx=20, pady=15, sticky='w')
         self.proj_id_entry = CTkEntry(self.proj_form_frame, font=('arial', 14), width=180)
-        self.proj_id_entry.grid(row=0, column=1)
+        self.proj_id_entry.grid(row=0, column=1, sticky='w')
         
         # 项目名称
         CTkLabel(self.proj_form_frame, text='项目名称', font=('arial', 16, 'bold'), text_color='white').grid(row=1, column=0, padx=20, pady=15, sticky='w')
         self.proj_name_entry = CTkEntry(self.proj_form_frame, font=('arial', 14), width=180)
-        self.proj_name_entry.grid(row=1, column=1)
+        self.proj_name_entry.grid(row=1, column=1, sticky='w')
         
         # 开始日期
         CTkLabel(self.proj_form_frame, text='开始日期', font=('arial', 16, 'bold'), text_color='white').grid(row=2, column=0, padx=20, pady=15, sticky='w')
         self.proj_start_entry = CTkEntry(self.proj_form_frame, font=('arial', 14), width=180, placeholder_text='YYYY-MM-DD')
-        self.proj_start_entry.grid(row=2, column=1)
+        self.proj_start_entry.grid(row=2, column=1, sticky='w')
         
         # 结束日期
         CTkLabel(self.proj_form_frame, text='结束日期', font=('arial', 16, 'bold'), text_color='white').grid(row=3, column=0, padx=20, pady=15, sticky='w')
         self.proj_end_entry = CTkEntry(self.proj_form_frame, font=('arial', 14), width=180, placeholder_text='YYYY-MM-DD')
-        self.proj_end_entry.grid(row=3, column=1)
+        self.proj_end_entry.grid(row=3, column=1, sticky='w')
         
         # 项目状态
         CTkLabel(self.proj_form_frame, text='项目状态', font=('arial', 16, 'bold'), text_color='white').grid(row=4, column=0, padx=20, pady=15, sticky='w')
         status_options = ['未开始', '进行中', '已完成', '已暂停', '已取消']
         self.proj_status_box = CTkComboBox(self.proj_form_frame, values=status_options, font=('arial', 14), width=180, state='readonly')
-        self.proj_status_box.grid(row=4, column=1)
+        self.proj_status_box.grid(row=4, column=1, sticky='w')
         self.proj_status_box.set(status_options[0])
         
         # 项目负责人
         CTkLabel(self.proj_form_frame, text='项目负责人', font=('arial', 16, 'bold'), text_color='white').grid(row=5, column=0, padx=20, pady=15, sticky='w')
         self.load_employees_for_leader()
         self.proj_leader_box = CTkComboBox(self.proj_form_frame, values=self.leader_options, font=('arial', 14), width=180, state='readonly')
-        self.proj_leader_box.grid(row=5, column=1)
+        self.proj_leader_box.grid(row=5, column=1, sticky='w')
         if self.leader_options:
             self.proj_leader_box.set(self.leader_options[0])
         
