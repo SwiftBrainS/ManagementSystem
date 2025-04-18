@@ -2223,7 +2223,7 @@ class EmployeeManagementSystem:
         
         # 查询选项标签和下拉框
         CTkLabel(select_frame, text='选择查询:', font=('arial', 16, 'bold')).grid(row=0, column=0,padx=(80, 0), sticky='e')
-        #
+
         queries = [
             '查询同时参与多个项目的员工',
             '查询未分配部门的员工',
