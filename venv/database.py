@@ -412,6 +412,35 @@ def truncate_table(table_name):
         messagebox.showerror('错误', f'清空表格失败: {str(e)}')
         return False
 
+# 查询参与多个项目的员工
+def query_multi_project():
+    mycursor.execute('''SELECT e.EmployeeID, e.Name, 
+                    COUNT(*) AS num_participate
+                    FROM Employee e
+                    LEFT JOIN Participation p ON e.EmployeeID = p.EmployeeID
+                    LEFT JOIN Project pro ON p.ProjectID = pro.ProjectID
+                    GROUP BY e.EmployeeID, e.Name
+                    HAVING num_participate > 1''')
+    return mycursor.fetchall()
+
+# 查询没有分配部门的员工
+def query_employees_without_dept():
+    mycursor.execute('''SELECT e.EmployeeID, e.Name, e.Gender, e.ContactInfo
+                        FROM Employee e 
+                        WHERE e.DeptID is NULL
+                    ''')
+    return mycursor.fetchall()
+# 查询各部门平均工资
+def query_dept_avg_salary():
+    mycursor.execute('''SELECT d.DeptID, d.DeptName,
+                        AVG(p.BaseSalaryGrade) AS avg_salary
+                        FROM Department d
+                        LEFT JOIN Employee e  ON d.DeptID = e.DeptID
+                        LEFT JOIN Position p ON e.PositionID = p.PositionID
+                        GROUP BY d.DeptID, d.DeptName''')
+    return mycursor.fetchall()
+
+
 # 向现有数据库中添加示例数据
 def insert_sample_data():
     # 添加部门

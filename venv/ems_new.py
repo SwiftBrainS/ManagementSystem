@@ -261,7 +261,7 @@ class EmployeeManagementSystem:
         
         # 重置下拉框
         if self.department_options:
-            self.employee_dept_box.set(self.department_options[0])
+            self.employee_dept_box.set("请选择部门")
         if self.position_options:
             self.employee_position_box.set(self.position_options[0])
         
@@ -2305,7 +2305,6 @@ class EmployeeManagementSystem:
     
     def query_multi_project_employees(self):
         # 查询同时参与多个项目的员工
-        # 这需要在数据库模块中添加新的查询函数
         
         # 创建表格来显示结果
         columns = ('员工ID', '姓名', '参与项目数量')
@@ -2316,14 +2315,13 @@ class EmployeeManagementSystem:
             result_tree.column(col, width=200)
         
         result_tree.pack(fill='both', expand=True)
-        
-        # 模拟数据（实际应从数据库获取）
-        # 在真实实现中，应该添加一个数据库函数来获取这些数据
-        results = [
-            ('E001', '张三', 2),
-            ('E002', '李四', 2),
-            ('E003', '王五', 2)
-        ]
+
+        results = database.query_multi_project()
+        # results = [
+        #     ('E001', '张三', 2),
+        #     ('E002', '李四', 2),
+        #     ('E003', '王五', 2)
+        # ]
         
         # 填充表格
         for result in results:
@@ -2331,7 +2329,6 @@ class EmployeeManagementSystem:
     
     def query_employees_without_dept(self):
         # 查询未分配部门的员工
-        # 这需要在数据库模块中添加新的查询函数
         
         # 创建表格来显示结果
         columns = ('员工ID', '姓名', '性别', '联系方式')
@@ -2342,15 +2339,18 @@ class EmployeeManagementSystem:
             result_tree.column(col, width=150)
         
         result_tree.pack(fill='both', expand=True)
-        
-        # 模拟数据（实际应从数据库获取）
-        # 在真实实现中，应该添加一个数据库函数来获取这些数据
-        # 因为我们的示例数据中没有未分配部门的员工，所以这里显示为空
-        CTkLabel(self.result_scroll, text='没有找到未分配部门的员工').pack(pady=20)
-    
+
+        results = database.query_employees_without_dept()
+
+        if results is None:
+            CTkLabel(self.result_scroll, text='没有找到未分配部门的员工').pack(pady=20)
+        else:
+            # 填充表格
+            for result in results:
+                result_tree.insert('', 'end', values=result)
+
     def query_dept_avg_salary(self):
         # 查询各部门平均工资
-        # 这需要在数据库模块中添加新的查询函数
         
         # 创建表格来显示结果
         columns = ('部门ID', '部门名称', '平均工资')
@@ -2361,14 +2361,13 @@ class EmployeeManagementSystem:
             result_tree.column(col, width=200)
         
         result_tree.pack(fill='both', expand=True)
-        
-        # 模拟数据（实际应从数据库获取）
-        # 在真实实现中，应该添加一个数据库函数来获取这些数据
-        results = [
-            ('D001', '研发部', 14333.33),
-            ('D002', '市场部', 20000.00),
-            ('D003', '人事部', 0.00)  # 没有员工
-        ]
+
+        results = database.query_dept_avg_salary()
+        # results = [
+        #     ('D001', '研发部', 14333.33),
+        #     ('D002', '市场部', 20000.00),
+        #     ('D003', '人事部', 0.00)  # 没有员工
+        # ]
         
         # 填充表格
         for result in results:
@@ -2376,7 +2375,6 @@ class EmployeeManagementSystem:
     
     def query_top_projects_by_members(self):
         # 查询项目人数最多的前三个项目
-        # 这需要在数据库模块中添加新的查询函数
         
         # 创建表格来显示结果
         columns = ('项目ID', '项目名称', '成员数量', '项目状态')
