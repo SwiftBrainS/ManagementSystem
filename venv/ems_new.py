@@ -20,7 +20,7 @@ class EmployeeManagementSystem:
         # 加载顶部图片
         self.header_image = CTkImage(Image.open('bg.png'), size=(1200, 158))
         self.header_label = CTkLabel(root, image=self.header_image, text='')
-        self.header_label.grid(row=0, column=0)
+        self.header_label.grid(row=0, column=0, sticky='ew')  # 添加sticky='ew'使图片水平居中
         
         # 创建选项卡
         self.create_tabs()
@@ -182,10 +182,12 @@ class EmployeeManagementSystem:
         self.employee_tree = ttk.Treeview(self.employee_table_frame, columns=columns, show='headings', height=15)
         for col in columns:
             self.employee_tree.heading(col, text=col)
-            if col in ['姓名', '联系方式', '部门', '职位']:
-                self.employee_tree.column(col, width=150)
+            if col in ['联系方式', '入职日期', '出生日期']:
+                self.employee_tree.column(col, width=140)
+            elif col == '职位':
+                self.employee_tree.column(col, width=120)
             else:
-                self.employee_tree.column(col, width=100)
+                self.employee_tree.column(col, width=80)
         
         self.employee_tree.grid(row=1, column=0, sticky='nsew')
         
@@ -193,6 +195,11 @@ class EmployeeManagementSystem:
         scrollbar = ttk.Scrollbar(self.employee_table_frame, orient=VERTICAL, command=self.employee_tree.yview)
         scrollbar.grid(row=1, column=1, sticky='ns')
         self.employee_tree.configure(yscrollcommand=scrollbar.set)
+        
+        # 添加水平滚动条
+        hscrollbar = ttk.Scrollbar(self.employee_table_frame, orient=HORIZONTAL, command=self.employee_tree.xview)
+        hscrollbar.grid(row=2, column=0, sticky='ew')
+        self.employee_tree.configure(xscrollcommand=hscrollbar.set)
         
         # 绑定选择事件
         self.employee_tree.bind('<<TreeviewSelect>>', self.select_employee)
@@ -379,11 +386,18 @@ class EmployeeManagementSystem:
         
         # 填充表格
         for emp in results:
-            # 格式化日期
-            birth_date = emp[3].strftime('%Y-%m-%d') if emp[3] else ''
-            hire_date = emp[5].strftime('%Y-%m-%d') if emp[5] else ''
-            
-            self.employee_tree.insert('', 'end', values=(emp[0], emp[1], emp[2], birth_date, emp[4], hire_date, emp[6], emp[7]))
+            # 对于搜索结果，不需要格式化日期，因为search_employees_by_keyword返回的字段不包含日期
+            # 搜索结果顺序: EmployeeID, Name, Gender, ContactInfo, DeptName, PositionName
+            self.employee_tree.insert('', 'end', values=(
+                emp[0],  # EmployeeID
+                emp[1],  # Name
+                emp[2],  # Gender
+                '',      # BirthDate (不存在于搜索结果中)
+                emp[3],  # ContactInfo
+                '',      # HireDate (不存在于搜索结果中)
+                emp[4],  # DeptName
+                emp[5]   # PositionName
+            ))
     
     def load_departments(self):
         departments = database.fetch_departments()
@@ -519,15 +533,22 @@ class EmployeeManagementSystem:
             self.dept_tree.heading(col, text=col)
             if col == '部门描述':
                 self.dept_tree.column(col, width=200)
+            elif col == '部门名称' or col == '部门经理':
+                self.dept_tree.column(col, width=150)
             else:
                 self.dept_tree.column(col, width=120)
         
         self.dept_tree.grid(row=1, column=0, sticky='nsew')
         
-        # 滚动条
+        # 垂直滚动条
         scrollbar = ttk.Scrollbar(self.dept_table_frame, orient=VERTICAL, command=self.dept_tree.yview)
         scrollbar.grid(row=1, column=1, sticky='ns')
         self.dept_tree.configure(yscrollcommand=scrollbar.set)
+        
+        # 水平滚动条
+        hscrollbar = ttk.Scrollbar(self.dept_table_frame, orient=HORIZONTAL, command=self.dept_tree.xview)
+        hscrollbar.grid(row=2, column=0, sticky='ew')
+        self.dept_tree.configure(xscrollcommand=hscrollbar.set)
         
         # 绑定选择事件
         self.dept_tree.bind('<<TreeviewSelect>>', self.select_department)
@@ -885,14 +906,22 @@ class EmployeeManagementSystem:
         self.pos_tree = ttk.Treeview(self.pos_table_frame, columns=columns, show='headings', height=15)
         for col in columns:
             self.pos_tree.heading(col, text=col)
-            self.pos_tree.column(col, width=120)
+            if col == '职位名称':
+                self.pos_tree.column(col, width=180)
+            else:
+                self.pos_tree.column(col, width=120)
         
         self.pos_tree.grid(row=1, column=0, sticky='nsew')
         
-        # 滚动条
+        # A垂直滚动条
         scrollbar = ttk.Scrollbar(self.pos_table_frame, orient=VERTICAL, command=self.pos_tree.yview)
         scrollbar.grid(row=1, column=1, sticky='ns')
         self.pos_tree.configure(yscrollcommand=scrollbar.set)
+        
+        # 水平滚动条
+        hscrollbar = ttk.Scrollbar(self.pos_table_frame, orient=HORIZONTAL, command=self.pos_tree.xview)
+        hscrollbar.grid(row=2, column=0, sticky='ew')
+        self.pos_tree.configure(xscrollcommand=hscrollbar.set)
         
         # 绑定选择事件
         self.pos_tree.bind('<<TreeviewSelect>>', self.select_position)
@@ -1184,7 +1213,7 @@ class EmployeeManagementSystem:
         search_frame = CTkFrame(self.proj_table_frame)
         search_frame.grid(row=0, column=0, pady=5, sticky='ew')
         
-        search_options = ['ProjectID', 'ProjectName', 'Status', 'Leader']
+        search_options = ['ProjectID', 'ProjectName', 'LeaderID', 'Status']
         self.proj_search_box = CTkComboBox(search_frame, values=search_options, state='readonly', width=120)
         self.proj_search_box.grid(row=0, column=0, padx=5, pady=5)
         self.proj_search_box.set('搜索条件')
@@ -1199,25 +1228,36 @@ class EmployeeManagementSystem:
         show_all_btn.grid(row=0, column=3, padx=5, pady=5)
         
         # 项目表格
-        columns = ('项目ID', '项目名称', '开始日期', '结束日期', '项目状态', '项目负责人')
+        columns = ('项目ID', '项目名称', '开始日期', '结束日期', '状态', '项目负责人')
         
         self.proj_tree = ttk.Treeview(self.proj_table_frame, columns=columns, show='headings', height=15)
         for col in columns:
             self.proj_tree.heading(col, text=col)
-            if col in ['项目名称']:
+            if col == '项目名称':
                 self.proj_tree.column(col, width=200)
+            elif col == '项目负责人':
+                self.proj_tree.column(col, width=150)
             else:
                 self.proj_tree.column(col, width=120)
         
         self.proj_tree.grid(row=1, column=0, sticky='nsew')
         
-        # 滚动条
+        # 垂直滚动条
         scrollbar = ttk.Scrollbar(self.proj_table_frame, orient=VERTICAL, command=self.proj_tree.yview)
         scrollbar.grid(row=1, column=1, sticky='ns')
         self.proj_tree.configure(yscrollcommand=scrollbar.set)
         
+        # 水平滚动条
+        hscrollbar = ttk.Scrollbar(self.proj_table_frame, orient=HORIZONTAL, command=self.proj_tree.xview)
+        hscrollbar.grid(row=2, column=0, sticky='ew')
+        self.proj_tree.configure(xscrollcommand=hscrollbar.set)
+        
         # 绑定选择事件
         self.proj_tree.bind('<<TreeviewSelect>>', self.select_project)
+        
+        # 添加查看项目成员按钮
+        view_btn = CTkButton(self.proj_table_frame, text='查看项目成员', command=self.view_project_members)
+        view_btn.grid(row=3, column=0, pady=10)
     
     def load_project_data(self):
         # 清空表格
@@ -1585,17 +1625,24 @@ class EmployeeManagementSystem:
         self.part_tree = ttk.Treeview(self.part_table_frame, columns=columns, show='headings', height=15)
         for col in columns:
             self.part_tree.heading(col, text=col)
-            if col in ['项目名称']:
+            if col in ['项目名称', '项目角色']:
                 self.part_tree.column(col, width=180)
+            elif col == '员工姓名':
+                self.part_tree.column(col, width=150)
             else:
-                self.part_tree.column(col, width=100)
+                self.part_tree.column(col, width=120)
         
         self.part_tree.grid(row=1, column=0, sticky='nsew')
         
-        # 滚动条
+        # 垂直滚动条
         scrollbar = ttk.Scrollbar(self.part_table_frame, orient=VERTICAL, command=self.part_tree.yview)
         scrollbar.grid(row=1, column=1, sticky='ns')
         self.part_tree.configure(yscrollcommand=scrollbar.set)
+        
+        # 水平滚动条
+        hscrollbar = ttk.Scrollbar(self.part_table_frame, orient=HORIZONTAL, command=self.part_tree.xview)
+        hscrollbar.grid(row=2, column=0, sticky='ew')
+        self.part_tree.configure(xscrollcommand=hscrollbar.set)
         
         # 绑定选择事件
         self.part_tree.bind('<<TreeviewSelect>>', self.select_participation)
@@ -1842,7 +1889,7 @@ class EmployeeManagementSystem:
         stats_frame.pack(fill='both', expand=True, padx=10, pady=10)
         
         # 标题
-        CTkLabel(stats_frame, text='统计分析', font=('arial', 24, 'bold'), text_color='white').pack(pady=20)
+        CTkLabel(stats_frame, text='统计分析', font=('arial', 24, 'bold'), text_color='white').pack()
         
         # 创建选项卡
         stats_tab_view = CTkTabview(stats_frame, width=1100, height=500)
@@ -1955,21 +2002,24 @@ class EmployeeManagementSystem:
         query_frame = CTkFrame(parent)
         query_frame.pack(fill='x', padx=10, pady=10)
         
+        # 布局使用网格结构并居中对齐
+        query_frame.grid_columnconfigure((0, 1, 2, 3, 4), weight=1)  # 使列平均分布
+        
         # 查询选项
-        CTkLabel(query_frame, text='查询选项:', font=('arial', 14, 'bold')).grid(row=0, column=0, padx=10, pady=10)
+        CTkLabel(query_frame, text='查询选项:', font=('arial', 14, 'bold')).grid(row=0, column=0, padx=10, pady=10, sticky='e')
         
         options = ['按部门查看员工分布', '按职位查看员工分布', '按项目参与情况查看']
         self.emp_query_box = CTkComboBox(query_frame, values=options, width=250, state='readonly')
-        self.emp_query_box.grid(row=0, column=1, padx=10, pady=10)
+        self.emp_query_box.grid(row=0, column=1, padx=10, pady=10, sticky='ew')
         self.emp_query_box.set(options[0])
         
         # 部门/职位/项目选择
-        CTkLabel(query_frame, text='选择:', font=('arial', 14, 'bold')).grid(row=0, column=2, padx=10, pady=10)
+        CTkLabel(query_frame, text='选择:', font=('arial', 14, 'bold')).grid(row=0, column=2, padx=10, pady=10, sticky='e')
         
         # 初始加载部门列表
         self.load_departments()
         self.emp_selection_box = CTkComboBox(query_frame, values=self.department_options, width=250, state='readonly')
-        self.emp_selection_box.grid(row=0, column=3, padx=10, pady=10)
+        self.emp_selection_box.grid(row=0, column=3, padx=10, pady=10, sticky='ew')
         if self.department_options:
             self.emp_selection_box.set(self.department_options[0])
         
@@ -1980,9 +2030,9 @@ class EmployeeManagementSystem:
         # 选项变更时更新下拉列表
         self.emp_query_box.configure(command=self.update_employee_query_selection)
         
-        # 结果显示框架
+        # 结果显示框架 - 减少上边距以使结果显示更靠上
         self.emp_result_frame = CTkFrame(parent)
-        self.emp_result_frame.pack(fill='both', expand=True, padx=10, pady=10)
+        self.emp_result_frame.pack(fill='both', expand=True, padx=10, pady=(5, 10))
         
         # 默认显示部门员工分布
         self.show_department_distribution()
@@ -2158,8 +2208,21 @@ class EmployeeManagementSystem:
         query_frame = CTkFrame(parent)
         query_frame.pack(fill='both', expand=True, padx=10, pady=10)
         
-        # 查询选项
-        CTkLabel(query_frame, text='选择查询:', font=('arial', 16, 'bold')).grid(row=0, column=0, padx=10, pady=20, sticky='w')
+        # 使用列权重使布局居中
+        query_frame.grid_columnconfigure(0, weight=1)
+        query_frame.grid_columnconfigure(1, weight=1)
+        
+        # 创建查询选择部分的容器框架
+        select_frame = CTkFrame(query_frame, fg_color="transparent")
+        select_frame.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky='ew')
+        
+        # 居中布局选择框架
+        select_frame.grid_columnconfigure(0, weight=1)
+        select_frame.grid_columnconfigure(1, weight=2)
+        select_frame.grid_columnconfigure(2, weight=1)
+        
+        # 查询选项标签和下拉框
+        CTkLabel(select_frame, text='选择查询:', font=('arial', 16, 'bold')).grid(row=0, column=0,padx=(80, 0), sticky='e')
         
         queries = [
             '查询同时参与多个项目的员工',
@@ -2169,43 +2232,51 @@ class EmployeeManagementSystem:
             '按关键字搜索员工（姓名、部门、职位）'
         ]
         
-        self.advanced_query_box = CTkComboBox(query_frame, values=queries, width=350, state='readonly')
-        self.advanced_query_box.grid(row=0, column=1, padx=10, pady=20)
+        self.advanced_query_box = CTkComboBox(select_frame, values=queries, width=350, state='readonly')
+        self.advanced_query_box.grid(row=0, column=1, padx=(0, 110))
         self.advanced_query_box.set(queries[0])
         
-        # 搜索关键字（仅在按关键字搜索时显示）
-        self.keyword_label = CTkLabel(query_frame, text='关键字:', font=('arial', 14))
-        self.keyword_entry = CTkEntry(query_frame, width=200)
+        # 搜索关键字输入框和标签（居中布局）
+        keyword_frame = CTkFrame(query_frame, fg_color="transparent")
+        keyword_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky='ew')
+        
+        keyword_frame.grid_columnconfigure(0, weight=1)
+        keyword_frame.grid_columnconfigure(1, weight=1)
+        keyword_frame.grid_columnconfigure(2, weight=1)
+        
+        self.keyword_label = CTkLabel(keyword_frame, text='关键字:', font=('arial', 14))
+        self.keyword_label.grid(row=0, column=0, padx=10, sticky='e')
+        
+        self.keyword_entry = CTkEntry(keyword_frame, width=250)
+        self.keyword_entry.grid(row=0, column=1, padx=10, sticky='ew')
+        
+        # 执行查询按钮
+        execute_btn = CTkButton(keyword_frame, text='执行查询', width=120, command=self.execute_advanced_query)
+        execute_btn.grid(row=0, column=2, padx=10, pady=5, sticky='w')
         
         # 设置命令以在选择更改时更新界面
         self.advanced_query_box.configure(command=self.update_advanced_query_ui)
         
-        # 执行查询按钮
-        execute_btn = CTkButton(query_frame, text='执行查询', width=120, command=self.execute_advanced_query)
-        execute_btn.grid(row=1, column=0, columnspan=2, pady=20)
-        
         # 结果显示框架
         result_frame = CTkFrame(query_frame)
-        result_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky='nsew')
+        result_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=(5, 10), sticky='nsew')
         
         # 配置行和列权重，使结果框架可以扩展
         query_frame.grid_rowconfigure(2, weight=1)
-        query_frame.grid_columnconfigure(0, weight=1)
-        query_frame.grid_columnconfigure(1, weight=1)
         
         # 创建结果显示区
         self.result_label = CTkLabel(result_frame, text='查询结果', font=('arial', 16, 'bold'))
-        self.result_label.pack(pady=10)
+        self.result_label.pack(pady=(5, 5))  # 减少上下边距
         
         # 创建滚动框架
-        self.result_scroll = CTkScrollableFrame(result_frame, width=700, height=300)
-        self.result_scroll.pack(fill='both', expand=True, padx=10, pady=10)
+        self.result_scroll = CTkScrollableFrame(result_frame, width=700, height=350)
+        self.result_scroll.pack(fill='both', expand=True, padx=10)
     
     def update_advanced_query_ui(self, choice):
         # 根据选择的查询类型更新界面
         if choice == '按关键字搜索员工（姓名、部门、职位）':
-            self.keyword_label.grid(row=1, column=0, padx=10, pady=10, sticky='e')
-            self.keyword_entry.grid(row=1, column=1, padx=10, pady=10, sticky='w')
+            self.keyword_label.grid(row=0, column=0, padx=10, pady=5, sticky='e')
+            self.keyword_entry.grid(row=0, column=1, padx=10, pady=5, sticky='ew')
         else:
             self.keyword_label.grid_forget()
             self.keyword_entry.grid_forget()
@@ -2342,7 +2413,7 @@ class EmployeeManagementSystem:
                 result_tree.column(col, width=100)
         
         result_tree.pack(fill='both', expand=True)
-        
+        #result_tree.grid(row=1)
         # 获取搜索结果
         employees = database.search_employees_by_keyword(keyword)
         
@@ -2355,13 +2426,32 @@ class EmployeeManagementSystem:
 
 # 主程序
 if __name__ == "__main__":
+    # 在直接运行此文件时执行的代码
+    # 初始化数据库连接
+    import database
+    
+    try:
+        # 连接数据库
+        database.connect_database()
+        
+        # 检查是否已存在数据，如果不存在则添加样例数据
+        mycursor = database.mycursor
+        mycursor.execute("SELECT COUNT(*) FROM Department")
+        dept_count = mycursor.fetchone()[0]
+        
+        if dept_count == 0:
+            database.insert_sample_data()
+    except Exception as e:
+        from tkinter import messagebox
+        import tkinter as tk
+        root = tk.Tk()
+        root.withdraw()
+        messagebox.showerror('错误', f'初始化数据库时出错: {str(e)}')
+        root.destroy()
+        import sys
+        sys.exit(1)
+    
+    # 启动主界面
     root = CTk()
     app = EmployeeManagementSystem(root)
-    
-    # 尝试初始化示例数据
-    try:
-        database.insert_sample_data()
-    except:
-        pass
-    
     root.mainloop() 

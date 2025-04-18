@@ -21,12 +21,13 @@ def main():
         # 连接数据库
         database.connect_database()
         
-        # 尝试添加样例数据
-        try:
+        # 检查是否已存在数据，如果不存在则添加样例数据
+        mycursor = database.mycursor
+        mycursor.execute("SELECT COUNT(*) FROM Department")
+        dept_count = mycursor.fetchone()[0]
+        
+        if dept_count == 0:
             database.insert_sample_data()
-        except:
-            # 如果样例数据已存在，忽略错误
-            pass
         
         # 启动登录界面
         import login
