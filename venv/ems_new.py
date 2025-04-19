@@ -2029,8 +2029,7 @@ class EmployeeManagementSystem:
         
         # 选项变更时更新下拉列表
         self.emp_query_box.configure(command=self.update_employee_query_selection)
-        
-        # 结果显示框架 - 减少上边距以使结果显示更靠上
+
         self.emp_result_frame = CTkFrame(parent)
         self.emp_result_frame.pack(fill='both', expand=True, padx=10, pady=(5, 10))
         
@@ -2317,11 +2316,6 @@ class EmployeeManagementSystem:
         result_tree.pack(fill='both', expand=True)
 
         results = database.query_multi_project()
-        # results = [
-        #     ('E001', '张三', 2),
-        #     ('E002', '李四', 2),
-        #     ('E003', '王五', 2)
-        # ]
         
         # 填充表格
         for result in results:
@@ -2363,11 +2357,6 @@ class EmployeeManagementSystem:
         result_tree.pack(fill='both', expand=True)
 
         results = database.query_dept_avg_salary()
-        # results = [
-        #     ('D001', '研发部', 14333.33),
-        #     ('D002', '市场部', 20000.00),
-        #     ('D003', '人事部', 0.00)  # 没有员工
-        # ]
         
         # 填充表格
         for result in results:
@@ -2424,7 +2413,7 @@ class EmployeeManagementSystem:
 
 # 主程序
 if __name__ == "__main__":
-    # 在直接运行此文件时执行的代码
+
     # 初始化数据库连接
     import database
     

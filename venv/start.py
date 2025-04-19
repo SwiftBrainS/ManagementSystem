@@ -5,7 +5,6 @@ from tkinter import messagebox
 import tkinter as tk
 
 def main():
-    # 确保必要的图片文件存在
     required_files = ['cover.png', 'bg.png']
     missing_files = [f for f in required_files if not os.path.exists(f)]
     
