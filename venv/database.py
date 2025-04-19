@@ -5,7 +5,7 @@ import datetime
 def connect_database():
     global mycursor, conn
     try:
-        conn = pymysql.connect(host='localhost', user='root', password='143321')
+        conn = pymysql.connect(host='localhost', user='数据库用户名', password='数据库密码')
         mycursor = conn.cursor()
     except:
         messagebox.showerror('Error', '数据库连接失败')
